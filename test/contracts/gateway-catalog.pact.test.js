@@ -13,7 +13,7 @@ const provider = new PactV3({
   dir: path.resolve(process.cwd(), "pacts"),
 });
 
-describe("Gateway → Catalog Service contract", () => {
+describe("Gateway -> Catalog Service contract", () => {
   it("expects a product response when requesting by ID", async () => {
     await provider
       .given("product sku-123 exists")

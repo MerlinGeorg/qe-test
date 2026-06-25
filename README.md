@@ -77,7 +77,6 @@ Using Pact.js, these tests define expected request/response interactions with do
 - Mutable state (cart, orders, payments) is reset between tests using `resetState()` so tests do not bleed into each other
 - `REQUIRE_AUTH=false` by default — the integration test suite runs without tokens. `auth-required.test.js` explicitly tests the `REQUIRE_AUTH=true` path in isolation
 - Test credentials (`JWT_SECRET=test-secret` etc.) are intentionally hardcoded in test setup files — they are not real secrets and carry no production risk
-- `.env.test` is not used — all test environment variables are set directly in `tests/helpers/setup.js` and `tests/auth-required.test.js`
 
 ---
 
