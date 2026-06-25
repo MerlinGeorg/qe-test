@@ -54,51 +54,21 @@ curl http://localhost:9090/health
 ### Test approach
 
 The goal of this test suite is to validate the API gateway's behaviour **as an API consumer would observe it** - through HTTP request and response - without testing Node.js implementation details.
+The test suite is organized into three layers:
 
-The suite is structured around three complementary layers:
+**1. Integration tests (primary)**
+Most tests send real HTTP requests through the gateway, which proxies to in-process mock services (auth, catalog, inventory, etc.). The full flow is exercised:
 
----
+`Test → Gateway → Proxy → Downstream → Response`
 
-#### 1. Integration tests (primary)
+All services run via `http.createServer`, while the gateway is tested using Supertest (no real port needed).
 
-The vast majority of the suite. Each test sends a real HTTP request through the gateway, which proxies it to a real mock downstream service running in-process, and asserts on the actual HTTP response. The full stack is exercised on every call:
+**2. Auth enforcement tests**
+Since config is loaded once, testing `REQUIRE_AUTH=true` requires a separate isolated setup. This test file sets env variables before loading modules and runs sequentially to avoid conflicts, ensuring real JWT enforcement behavior.
 
-```
-Test → Gateway middleware → Proxy → Downstream service → Response
-```
+**3. Contract tests**
+Using Pact.js, these tests define expected request/response interactions with downstream services. They generate contract files (`pacts/`) to ensure compatibility and catch breaking changes early.
 
-All downstream mock services (auth, catalog, inventory, cart, orders, payments, shipping, customers) are started on their configured ports using Node's `http.createServer` before tests run. The gateway itself is loaded via `supertest` — no real port binding needed for it since supertest manages that internally.
-
-This means:
-- No external processes or terminals required
-- No Docker needed to run tests
-- The entire stack boots and tears down automatically per test file
-
----
-
-#### 2. Auth enforcement tests (`REQUIRE_AUTH=true`)
-
-Because `src/config/index.js` is a Node module singleton — it reads `REQUIRE_AUTH` once at load time and freezes it — testing JWT enforcement requires a completely isolated process where `REQUIRE_AUTH=true` is set **before** any module is loaded.
-
-`tests/auth-required.test.js` handles this with its own independent setup: it does not use the shared `helpers/setup.js`, sets all env variables at the very top of the file, and starts its own fresh gateway instance. Jest's `--runInBand` flag ensures it runs sequentially after other test files so there are no port conflicts.
-
-This tests the full real gateway behaviour under auth — not a mock or middleware unit test.
-
----
-
-#### 3. Contract tests (`tests/contracts/`)
-
-In a microservices architecture, services are owned by different teams and deployed independently. Contract tests verify that the gateway's expectations of each downstream service are formally documented.
-
-Using Pact.js, each contract test:
-- Defines what request the gateway sends to a downstream service
-- Defines what response shape the gateway expects back
-- Runs the gateway's actual HTTP client (`fetchJson`) against a Pact mock server
-- Generates a JSON contract file in `pacts/` that the downstream team can verify against their service
-
-This catches breaking changes — such as a field being renamed or removed in a downstream service — before they reach production.
-
----
 
 ### Assumptions
 
