@@ -1,0 +1,60 @@
+{
+  "name": "ecommerce-api-gateway",
+  "version": "1.0.0",
+  "description": "Node.js API gateway for an ecommerce microservices system",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "dev:all": "concurrently -n gateway,auth,customers,catalog,inventory,cart,orders,payments,shipping -c blue,green,green,green,green,green,green,green,green \"npm run dev\" \"npm run dev:auth\" \"npm run dev:customers\" \"npm run dev:catalog\" \"npm run dev:inventory\" \"npm run dev:cart\" \"npm run dev:orders\" \"npm run dev:payments\" \"npm run dev:shipping\"",
+    "dev:auth": "nodemon services/run-service.js auth",
+    "dev:customers": "nodemon services/run-service.js customers",
+    "dev:catalog": "nodemon services/run-service.js catalog",
+    "dev:inventory": "nodemon services/run-service.js inventory",
+    "dev:cart": "nodemon services/run-service.js cart",
+    "dev:orders": "nodemon services/run-service.js orders",
+    "dev:payments": "nodemon services/run-service.js payments",
+    "dev": "nodemon src/server.js",
+    "dev:shipping": "nodemon services/shipping/server.js",
+    "start:all": "concurrently -n gateway,auth,customers,catalog,inventory,cart,orders,payments,shipping -c blue,green,green,green,green,green,green,green,green \"npm run start\" \"npm run start:auth\" \"npm run start:customers\" \"npm run start:catalog\" \"npm run start:inventory\" \"npm run start:cart\" \"npm run start:orders\" \"npm run start:payments\" \"npm run start:shipping\"",
+    "start:auth": "node services/run-service.js auth",
+    "start:customers": "node services/run-service.js customers",
+    "start:catalog": "node services/run-service.js catalog",
+    "start:inventory": "node services/run-service.js inventory",
+    "start:cart": "node services/run-service.js cart",
+    "start:orders": "node services/run-service.js orders",
+    "start:payments": "node services/run-service.js payments",
+    "start": "node src/server.js",
+    "start:shipping": "node services/shipping/server.js",
+    "test": "jest --runInBand --forceExit",
+    "test:contracts": "jest --testPathPatterns=contracts --runInBand --forceExit",
+    "test:watch": "jest --watch --runInBand --forceExit",
+    "test:coverage": "jest --runInBand --coverage"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "api-gateway",
+    "ecommerce",
+    "microservices"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "@pact-foundation/pact": "^17.0.0",
+    "concurrently": "^9.1.2",
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.1"
+  }
+}
